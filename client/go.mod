@@ -3,12 +3,12 @@ module github.com/godwinpinto/gatepass/client
 go 1.19
 
 require (
+	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/google/uuid v1.3.0
 	github.com/passageidentity/passage-go v1.4.0
 )
 
 require (
-	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect

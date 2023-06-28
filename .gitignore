@@ -1,7 +1,5 @@
-web/test/**
 web/.env
 web/node_modules/**
-web/build/**
 client/go.sum
 .vscode/**
 server/go.sum
