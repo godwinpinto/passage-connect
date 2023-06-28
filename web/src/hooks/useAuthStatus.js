@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_PASSAGE_APP_ID;
+const API_URL = process.env.PASSAGE_CONNECT_URL;
 
 export function useAuthStatus() {
   const [result, setResult] = useState({
