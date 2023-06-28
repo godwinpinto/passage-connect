@@ -83,11 +83,12 @@ func main() {
 
 	fs := http.FileServer(http.Dir("web"))
 	http.Handle("/", fs)
+	http.Handle("/dashboard", fs)
 
 	http.HandleFunc("/connect", handleConnect)
 	http.HandleFunc("/login", handleLogin)
 
-	log.Println("Server listening on port 8080...")
+	log.Println("Server listening on port 443...")
 	//log.Fatal(http.ListenAndServe(":8080", nil))
 	log.Fatal(http.ListenAndServeTLS(":443", "../cert/cert.pem", "../cert/key.pem", nil))
 }

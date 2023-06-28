@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Create a folder "passage-connect" outside connect-server
+rm -rf ../../passage-connect
+
 mkdir ../../passage-connect
 
 # Copy passage_connect_server into the new directory
