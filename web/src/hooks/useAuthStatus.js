@@ -17,7 +17,7 @@ export function useAuthStatus() {
       token:authToken,
     };
     axios
-      .post(`${API_URL}/login`, null, {
+      .post(`${API_URL}/login`, body, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
