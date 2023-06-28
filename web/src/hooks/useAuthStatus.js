@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-//const API_URL = ;
+const API_URL = process.env.REACT_APP_PASSAGE_CONNECT_URL;
 
 export function useAuthStatus() {
   const [result, setResult] = useState({
@@ -17,7 +17,7 @@ export function useAuthStatus() {
       token:authToken,
     };
     axios
-      .post(`${process.env.PASSAGE_CONNECT_URL}/login`, body, {
+      .post(`${API_URL}/login`, null, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
