@@ -2,6 +2,8 @@ module github.com/godwinpinto/passage_connect_server
 
 go 1.19
 
+require github.com/passageidentity/passage-go v1.4.0
+
 require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
@@ -12,7 +14,7 @@ require (
 	github.com/lestrrat-go/iter v1.0.1 // indirect
 	github.com/lestrrat-go/jwx v1.2.24 // indirect
 	github.com/lestrrat-go/option v1.0.0 // indirect
-	github.com/passageidentity/passage-go v1.4.0 // indirect
+	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect

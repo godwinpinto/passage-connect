@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/magiconair/properties"
 	passage "github.com/passageidentity/passage-go"
 )
 
@@ -51,9 +52,21 @@ var usersData sync.Map // Map to store user-specific data
 var passageClient *passage.App
 
 func main() {
+	var passageAppId string
+	var passageApiKey string
 
-	passageAppId := os.Getenv("PASSAGE_APP_ID")
-	passageApiKey := os.Getenv("PASSAGE_API_KEY")
+	filePath := "config.properties"
+	data, err := readPropertiesFile(filePath)
+	if err != nil {
+		fmt.Println("Error reading config.properties file:", err)
+		fmt.Println("Fall back to environment variables", err)
+		passageAppId = os.Getenv("PASSAGE_APP_ID")
+		passageApiKey = os.Getenv("PASSAGE_API_KEY")
+	} else {
+		passageAppId = data["PASSAGE_APP_ID"]
+		passageApiKey = data["PASSAGE_API_KEY"]
+	}
+
 	if passageAppId == "" {
 		log.Fatal("PASSAGE_APP_ID environment variable not set")
 		return
@@ -68,16 +81,15 @@ func main() {
 		HeaderAuth: true,
 	})
 
-	fs := http.FileServer(http.Dir("../web/build"))
+	fs := http.FileServer(http.Dir("web"))
 	http.Handle("/", fs)
 
 	http.HandleFunc("/connect", handleConnect)
 	http.HandleFunc("/login", handleLogin)
 
 	log.Println("Server listening on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-	//	log.Fatal(http.ListenAndServeTLS(":8080", "cert.pem", "key.pem", nil))
-
+	//log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServeTLS(":443", "../cert/cert.pem", "../cert/key.pem", nil))
 }
 
 func handleConnect(w http.ResponseWriter, r *http.Request) {
@@ -127,8 +139,6 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 	case <-done:
 		if userData.data == "" {
 			fmt.Println("Data is set")
-			w.WriteHeader(http.StatusOK)
-			w.Header().Set("Content-Type", "application/json")
 			connectRes := ConnectResponse{
 				Token: userData.data,
 			}
@@ -136,56 +146,29 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				fmt.Fprintf(w, "Error: %v", err)
-				return
-			}
-			w.Write(jsonData)
 
+			} else {
+				w.WriteHeader(http.StatusOK)
+				w.Header().Set("Content-Type", "application/json")
+				w.Write(jsonData)
+			}
 		}
 	case <-time.After(5 * time.Second):
 		userData.mutex.Lock()
 		userData.data = ""
 		userData.ready = true
-		userData.condition.Signal()
+		userData.condition.Broadcast()
 		userData.mutex.Unlock()
 
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprintf(w, "Request has timed out")
 	}
 
-	/* 	userData.mutex.Lock()
-	   	select {
-	   	case <-time.After(5 * time.Second):
-	   		userData.mutex.Unlock()
-	   		w.WriteHeader(http.StatusUnauthorized)
-	   		fmt.Fprintf(w, "Request has Timed out")
-	   		return
-	   	default:
-	   		for !userData.ready {
-	   			userData.condition.Wait()
-	   		}
-	   	}
-	   	userData.mutex.Unlock()
-
-	   	fmt.Println("Data is set")
-	   	w.WriteHeader(http.StatusOK)
-	   	w.Header().Set("Content-Type", "application/json")
-	   	connectRes := ConnectResponse{
-	   		Token: userData.data,
-	   	}
-	   	jsonData, err := json.Marshal(connectRes)
-	   	if err != nil {
-	   		w.WriteHeader(http.StatusInternalServerError)
-	   		fmt.Fprintf(w, "Error: %v", err)
-	   		return
-	   	}
-	   	w.Write(jsonData)
-	*/ //	fmt.Fprintf(w, "Value: %s\n", userData.data)
 	clearUserData(userID)
 }
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	var authReq AuthRequest
-	//	responseMsg := "OK"
 	err := json.NewDecoder(r.Body).Decode(&authReq)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -195,40 +178,25 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	token := authReq.Token
 	userID, err := passageClient.AuthenticateRequest(r)
 	if err != nil {
-		// 🚨 Authentication failed!
+		// Authentication failed!
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	userData, found := getUserData(userID)
 	if !found {
-		userData = createUserData(userID)
+		//userData = createUserData(userID)
+	} else {
+		userData.mutex.Lock()
+		userData.data = token
+		userData.ready = true
+		userData.mutex.Unlock()
+		userData.condition.Broadcast() // Notify that data is set
 	}
 
-	userData.mutex.Lock()
-	userData.data = token
-	userData.ready = true
-	userData.mutex.Unlock()
-
 	//	w.Header().Set("Content-Type", "application/json")
-	userData.condition.Broadcast() // Notify that data is set
-	//	w.Header().Set("Authorization", fmt.Sprintf("Bearer %v", token))
-
-	/* 	response := Response{
-	   		Message: "Hello, World!",
-	   		Status:  http.StatusOK,
-	   	}
-	*/
-	// Marshal the response data to JSON
-	/* 	jsonData, err := json.Marshal(response)
-	   	if err != nil {
-	   		w.WriteHeader(http.StatusInternalServerError)
-	   		fmt.Fprintf(w, "Error: %v", err)
-	   		return
-	   	}
-	*/
 	w.WriteHeader(http.StatusOK)
 	//	w.Write(jsonData)
-	fmt.Fprintf(w, "OK")
+	fmt.Fprintf(w, "No active shell sessions found.")
 }
 
 func getUserData(userID string) (*UserData, bool) {
@@ -248,4 +216,21 @@ func createUserData(userID string) *UserData {
 
 func clearUserData(userID string) {
 	usersData.Delete(userID)
+}
+
+func readPropertiesFile(filePath string) (map[string]string, error) {
+	p, err := properties.LoadFile(filePath, properties.UTF8)
+	if err != nil {
+		return nil, err
+	}
+
+	data := make(map[string]string)
+
+	// Iterate over the properties and store them in the map
+	for _, key := range p.Keys() {
+		value := p.GetString(key, "")
+		data[key] = value
+	}
+
+	return data, nil
 }
