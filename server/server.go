@@ -192,6 +192,9 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	userData, found := getUserData(userID)
 	if !found {
+		w.WriteHeader(http.StatusNotFound)
+		//	w.Write(jsonData)
+		fmt.Fprintf(w, "There are no active connect request at the moment.")
 		//userData = createUserData(userID)
 	} else {
 		userData.mutex.Lock()
@@ -199,12 +202,12 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		userData.ready = true
 		userData.mutex.Unlock()
 		userData.condition.Broadcast() // Notify that data is set
+		w.WriteHeader(http.StatusOK)
+		//	w.Write(jsonData)
+		fmt.Fprintf(w, "Now you can proceed to your shell session.")
 	}
 
 	//	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	//	w.Write(jsonData)
-	fmt.Fprintf(w, "No active shell sessions found.")
 }
 
 func getUserData(userID string) (*UserData, bool) {

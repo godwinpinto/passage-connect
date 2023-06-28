@@ -26,11 +26,13 @@ export function useAuthStatus() {
         if (cancelRequest) {
           return;
         }
-        if(response.status !== 200){
+        if(response.status==404){
+          alert(response.data)
+        }else if(response.status !== 200){
           alert("Error Occured"+response.status+" "+response.statusText)
           window.location.href = "/";
         }else{
-          alert("You may now proceed with your SSH")
+          alert(response.data)
           window.location.href = "/";
         }
         const authStatus = "success";
