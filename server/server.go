@@ -82,8 +82,14 @@ func main() {
 	})
 
 	fs := http.FileServer(http.Dir("web"))
-	http.Handle("/", fs)
-	http.Handle("/dashboard", fs)
+
+	//	http.Handle("/", fs)
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.Handle("/dashboard", http.StripPrefix("/dashboard", fs))
+	http.Handle("/app/", http.StripPrefix("/app/", fs))
+	http.Handle("/", http.StripPrefix("/", fs))
+
+	//http.Handle("/dashboard", fs)
 
 	http.HandleFunc("/connect", handleConnect)
 	http.HandleFunc("/login", handleLogin)
