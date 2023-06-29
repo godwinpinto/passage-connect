@@ -35,12 +35,12 @@ func main() {
 	fmt.Println("")
 	myFigure.Print()
 	fmt.Println("")
-	authBean := util.AuthBean{
+	connectBean := util.ConnectRequest{
 		UserID: "XXSU3HpTzPlkq2d8SCRzbIa2",
 	}
 	cancelCounter := util.NewCancelCounter(30)
 	go util.CountdownProgressBar(cancelCounter)
-	authStatus := util.Authenticate(authBean, passageAppId)
+	authStatus := util.Authenticate(connectBean, passageAppId)
 	cancelCounter.Cancel()
 	fmt.Println("")
 	fmt.Println("")

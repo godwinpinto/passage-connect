@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -25,16 +26,16 @@ const (
 	AUTH_TIMEOUT
 )
 
-type AuthBean struct {
-	UserID string
+type ConnectRequest struct {
+	UserID string `json:"user_id"`
 }
 
-func Authenticate(authBean AuthBean, appID string) (status AuthStatus) {
+func Authenticate(connectBean ConnectRequest, appID string) (status AuthStatus) {
 	//	attempts := 2
 	var response string
 	var err error
 	//	for i := 0; i < attempts; i++ {
-	response, err = getData(authBean)
+	response, err = getData(connectBean)
 	/* 		if err == nil {
 	   			break
 	   		}
@@ -53,11 +54,11 @@ func Authenticate(authBean AuthBean, appID string) (status AuthStatus) {
 	return PassageAuthentication(connectRes.Token, appID)
 }
 
-func getData(authBean AuthBean) (response string, err error) {
+func getData(connectBean ConnectRequest) (response string, err error) {
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
-	jsonPayload, err := json.Marshal(authBean)
+	jsonPayload, err := json.Marshal(connectBean)
 	if err != nil {
 		fmt.Printf("Error encoding JSON payload: %v\n", err)
 		return
@@ -65,10 +66,11 @@ func getData(authBean AuthBean) (response string, err error) {
 
 	resp, err := client.Post("https://connect.coauth.dev/connect", "application/json", bytes.NewBuffer(jsonPayload))
 	if err != nil {
+		log.Fatal(err)
 		return "", err
 	}
 	defer resp.Body.Close()
-
+	fmt.Print(resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
 		return "", errors.New("HTTP Status is incorrect")
 	}
