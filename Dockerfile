@@ -20,11 +20,11 @@ WORKDIR /go/src/app
 COPY ./server .
 
 # Build the Go application
-RUN go mod download
+RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 
 # Stage 3: Create the final production image
-FROM alpine:latest
+FROM alpine:18
 
 # Set the working directory
 WORKDIR /app
