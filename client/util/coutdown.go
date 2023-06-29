@@ -2,11 +2,13 @@ package util
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
-func CountdownProgressBar(countdown int) {
+func CountdownProgressBar(cancelCounter *CancelCounter) {
 
+	countdown := cancelCounter.Countdown()
 	for i := countdown; i >= 0; i-- {
 		displayProgressBar(i, countdown)
 		time.Sleep(time.Second)
@@ -31,4 +33,35 @@ func getRepeatedString(ch string, n int) string {
 		result += ch
 	}
 	return result
+}
+
+type CancelCounter struct {
+	countdown int
+	cancelled bool
+	mutex     sync.Mutex
+}
+
+func NewCancelCounter(countdown int) *CancelCounter {
+	return &CancelCounter{
+		countdown: countdown,
+		cancelled: false,
+	}
+}
+
+func (c *CancelCounter) Countdown() int {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.countdown
+}
+
+func (c *CancelCounter) IsCancelled() bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.cancelled
+}
+
+func (c *CancelCounter) Cancel() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	c.cancelled = true
 }

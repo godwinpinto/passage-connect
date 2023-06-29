@@ -97,7 +97,7 @@ func main() {
 
 	log.Println("Server listening on port 443...")
 	//log.Fatal(http.ListenAndServe(":8080", nil))
-	log.Fatal(http.ListenAndServeTLS(":443", "../cert/cert.pem", "../cert/key.pem", nil))
+	log.Fatal(http.ListenAndServeTLS(":443", "cert/cert.pem", "cert/key.pem", nil))
 }
 
 func handleConnect(w http.ResponseWriter, r *http.Request) {
@@ -161,7 +161,7 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 				w.Write(jsonData)
 			}
 		}
-	case <-time.After(5 * time.Second):
+	case <-time.After(30 * time.Second):
 		userData.mutex.Lock()
 		userData.data = ""
 		userData.ready = true

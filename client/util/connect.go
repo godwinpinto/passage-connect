@@ -1,6 +1,8 @@
 package util
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +14,11 @@ import (
 
 type AuthStatus int
 
+type ConnectResponse struct {
+	Token   string `json:"token"`
+	Message string `json:"message"`
+}
+
 const (
 	AUTH_SUCCESS AuthStatus = iota
 	AUTH_FAILURE
@@ -19,34 +26,44 @@ const (
 )
 
 type AuthBean struct {
-	UserID  string
-	MacCode string
-	IPAddr  string
+	UserID string
 }
 
-func Authenticate(authBean AuthBean) (status AuthStatus) {
-	attempts := 2
+func Authenticate(authBean AuthBean, appID string) (status AuthStatus) {
+	//	attempts := 2
 	var response string
 	var err error
-	for i := 0; i < attempts; i++ {
-		response, err = getData()
-		if err == nil {
-			break
-		}
-	}
-	if response == "" {
+	//	for i := 0; i < attempts; i++ {
+	response, err = getData(authBean)
+	/* 		if err == nil {
+	   			break
+	   		}
+	*/ //	}
+	if response == "" || err != nil {
 		return AUTH_TIMEOUT
 	}
-	fmt.Println(response)
-	return passageAuthentication(response)
+	var connectRes ConnectResponse
+
+	err1 := json.Unmarshal([]byte(response), &connectRes)
+	if err1 != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	return PassageAuthentication(connectRes.Token, appID)
 }
 
-func getData() (response string, err error) {
+func getData(authBean AuthBean) (response string, err error) {
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 	}
+	jsonPayload, err := json.Marshal(authBean)
+	if err != nil {
+		fmt.Printf("Error encoding JSON payload: %v\n", err)
+		return
+	}
 
-	resp, err := client.Get("http://localhost:8080")
+	resp, err := client.Post("https://connect.coauth.dev/connect", "application/json", bytes.NewBuffer(jsonPayload))
 	if err != nil {
 		return "", err
 	}
@@ -66,8 +83,8 @@ func getData() (response string, err error) {
 	return string(body), nil
 }
 
-func passageAuthentication(authToken string) (authStatus AuthStatus) {
-	psg, _ := passage.New("<PASSAGE_APP_ID>", nil)
+func PassageAuthentication(authToken string, appID string) (authStatus AuthStatus) {
+	psg, _ := passage.New(appID, nil)
 	_, err := psg.ValidateAuthToken(authToken)
 	if err {
 		return AUTH_FAILURE
