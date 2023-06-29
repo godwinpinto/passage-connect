@@ -6,11 +6,11 @@ docker build -t passage-connect-client .
 
 docker create --name passage-connect-client-container passage-connect-client
 
-docker cp passage-connect-client-container:/goinstall/passage_connect.so build/
+docker cp passage-connect-client-container:/goinstall/pam_passage.so build/
 
 docker stop passage-connect-client-container
 docker container rm passage-connect-client-container
 
 cp config/pam.d/passage-connect-auth /etc/pam.d/
 
-cp build/passage_connect.so /usr/lib64/security/
+cp build/pam_passage.so /usr/lib64/security/

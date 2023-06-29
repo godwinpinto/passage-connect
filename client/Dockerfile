@@ -34,7 +34,7 @@ RUN mkdir /goinstall
 
 WORKDIR /goinstall
 
-COPY --from=builder /app/passage_connect.so .
+COPY --from=builder /app/pam_passage.so .
 
 # Expose the container port
 EXPOSE 80

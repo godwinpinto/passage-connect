@@ -4,7 +4,7 @@ VERSION    := 0.0.1
 all: build
 
 build:
-	go build -buildmode=c-shared -o passage_connect.so
+	go build -buildmode=c-shared -o pam_passage.so
 
 #install:
 #	cp passage_connect.so /usr/lib/security/
