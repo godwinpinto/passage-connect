@@ -19,4 +19,6 @@ docker build -t passage-connect .
 # Remove the copied cert directory
 rm -rf cert
 
+rm web/.env
+
 echo "Setup completed successfully!"

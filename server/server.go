@@ -145,7 +145,7 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 
 	select {
 	case <-done:
-		if userData.data == "" {
+		if userData.data != "" {
 			fmt.Println("Data is set")
 			connectRes := ConnectResponse{
 				Token: userData.data,
@@ -159,6 +159,7 @@ func handleConnect(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				w.Write(jsonData)
+
 			}
 		}
 	case <-time.After(30 * time.Second):
