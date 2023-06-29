@@ -1,72 +1,78 @@
 package main
 
-import (
-	"fmt"
-	"os"
-	"os/user"
+// #cgo LDFLAGS: -lpam
+// #include <security/pam_appl.h>
+// #include <security/pam_modules.h>
+import "C"
 
-	"github.com/common-nighthawk/go-figure"
-	util "github.com/godwinpinto/gatepass/client/util"
-	"github.com/magiconair/properties"
+import (
+	"strings"
+	"time"
+	"unsafe"
+
+	"github.com/godwinpinto/gatepass/client/util"
+	"github.com/muesli/go-pam"
+	log "github.com/sirupsen/logrus"
 )
 
-func main() {
-	var passageAppId string
+var (
+	logLevel = log.InfoLevel
+)
 
-	filePath := "/etc/passage_connect/config.properties"
-	data, err := readPropertiesFile(filePath)
-	if err != nil {
-		fmt.Println("Error reading config.properties file:", err)
-		fmt.Println("Fall back to environment variables", err)
-		passageAppId = os.Getenv("PASSAGE_APP_ID")
-	} else {
-		passageAppId = data["PASSAGE_APP_ID"]
-	}
-
-	currentUser, err := user.Current()
-	if err != nil {
-		fmt.Printf("Failed to get current user: %v\n", err)
-	}
-	fmt.Printf("Welcome %v", currentUser.Name)
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("Visit https://connect.coauth.dev to authenticate.")
-	myFigure := figure.NewFigure("Passage Connect Login", "", true)
-	fmt.Println("")
-	myFigure.Print()
-	fmt.Println("")
-	connectBean := util.ConnectRequest{
-		UserID: "XXSU3HpTzPlkq2d8SCRzbIa2",
-	}
-	cancelCounter := util.NewCancelCounter(30)
-	go util.CountdownProgressBar(cancelCounter)
-	authStatus := util.Authenticate(connectBean, passageAppId)
-	cancelCounter.Cancel()
-	fmt.Println("")
-	fmt.Println("")
-
-	if authStatus == util.AUTH_SUCCESS {
-		fmt.Println("You are logged in")
-	} else if authStatus == util.AUTH_TIMEOUT {
-		fmt.Println("Authentication timeout!!! Please login again")
-	} else {
-		fmt.Println("Authentication denied")
-	}
+func logError(args ...interface{}) {
+	log.Error(args...)
+	time.Sleep(time.Second)
 }
 
-func readPropertiesFile(filePath string) (map[string]string, error) {
-	p, err := properties.LoadFile(filePath, properties.UTF8)
+func logErrorf(s string, args ...interface{}) {
+	log.Errorf(s, args...)
+	time.Sleep(time.Second)
+}
+
+//export goAuthenticate
+func goAuthenticate(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
+	for _, arg := range argv {
+		if strings.ToLower(arg) == "debug" {
+			logLevel = log.DebugLevel
+		}
+	}
+	log.SetLevel(logLevel)
+	log.Debugf("argv: %+v", argv)
+
+	hdl := pam.Handle{Ptr: unsafe.Pointer(handle)}
+	username, err := hdl.GetUser()
 	if err != nil {
-		return nil, err
+		return C.PAM_AUTH_ERR
 	}
-
-	data := make(map[string]string)
-
-	// Iterate over the properties and store them in the map
-	for _, key := range p.Keys() {
-		value := p.GetString(key, "")
-		data[key] = value
+	configFileLocation, err := ReadUserConfig(username)
+	if err != nil {
+		logError(err)
+		return C.PAM_SUCCESS
 	}
+	/*
+		commented for now since you dont want to lock out other users
+		if err != nil {
+			logError(err)
+			switch err.(type) {
+			case user.UnknownUserError:
+				return C.PAM_USER_UNKNOWN
+			default:
+				return C.PAM_AUTHINFO_UNAVAIL
+			}
+		} */
 
-	return data, nil
+	if Controller(configFileLocation) == util.AUTH_SUCCESS {
+		return C.PAM_SUCCESS
+	}
+	return C.PAM_AUTH_ERR
+}
+
+//export setCred
+func setCred(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
+	return C.PAM_SUCCESS
+}
+
+// main is for testing purposes only, the PAM module has to be built with:
+// go build -buildmode=c-shared
+func main() {
 }

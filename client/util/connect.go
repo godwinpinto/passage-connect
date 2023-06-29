@@ -86,11 +86,22 @@ func getData(connectBean ConnectRequest) (response string, err error) {
 }
 
 func PassageAuthentication(authToken string, appID string) (authStatus AuthStatus) {
-	psg, _ := passage.New(appID, nil)
-	_, err := psg.ValidateAuthToken(authToken)
-	if err {
+	fmt.Println(appID)
+	fmt.Println(authToken)
+
+	psg, err2 := passage.New(appID, nil)
+	if err2 != nil {
+		fmt.Print(err2)
+	} else {
+		fmt.Print("NO ERROR IN PASSAGE CLIENT CREATION")
+	}
+
+	userID, success := psg.ValidateAuthToken(authToken)
+	fmt.Println(userID)
+	if success {
+		return AUTH_SUCCESS
+	} else {
 		return AUTH_FAILURE
 	}
-	return AUTH_SUCCESS
 
 }

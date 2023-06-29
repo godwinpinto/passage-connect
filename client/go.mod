@@ -19,8 +19,11 @@ require (
 	github.com/lestrrat-go/jwx v1.2.24 // indirect
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
+	github.com/muesli/go-pam v0.0.0-20180726201810-662d89573438 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
+	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	gopkg.in/resty.v1 v1.12.0 // indirect
 )
