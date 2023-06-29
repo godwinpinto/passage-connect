@@ -22,6 +22,8 @@ WORKDIR /app
 # Copy your Go and C source files to the container
 COPY . .
 
+RUN go mod tidy
+
 # Build the Go binary
 RUN make
 
