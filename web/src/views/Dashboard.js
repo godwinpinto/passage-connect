@@ -2,16 +2,15 @@ import {useAuthStatus} from '../hooks/useAuthStatus';
 import styles from '../styles/Dashboard.module.css';
 
 function Dashboard() {
-    const {isLoading, isAuthorized, username} = useAuthStatus();
+    const {isLoading, isAuthorized} = useAuthStatus();
 
     if (isLoading) {
         return null;
     }
     const authorizedBody = 
     <>
-        You successfully signed in with Passage.
+        You successfully signed in with Passage, now you may go back to your terminal.
         <br/><br/>
-        Your username is: <b>{username}</b>
     </>
 
     const unauthorizedBody = 
@@ -23,9 +22,9 @@ function Dashboard() {
 
     return (
         <div className={styles.dashboard}>
-            <div className={styles.title}>{isAuthorized ? 'Welcome!' : 'Unauthorized'}</div>
+            <div className={styles.title}>{isAuthorized==='success' || isAuthorized==='no_session' ? 'Welcome!' : 'Unauthorized'}</div>
             <div className={styles.message}>
-                { isAuthorized ? authorizedBody : unauthorizedBody }
+                { isAuthorized==='success' || isAuthorized==='no_session' ? authorizedBody : unauthorizedBody }
             </div>
         </div>
     );
