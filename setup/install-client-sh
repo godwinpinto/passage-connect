@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd ../client
+
+docker build -t passage-connect-client .
+
+docker create --name passage-connect-client-container passage-connect-client
+
+docker cp passage-connect-client-container:/goinstall/passage_connect.so build/
+
+docker stop passage-connect-client-container
+docker container rm passage-connect-client-container
+
