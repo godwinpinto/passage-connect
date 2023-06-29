@@ -11,6 +11,6 @@ docker cp passage-connect-client-container:/goinstall/passage_connect.so build/
 docker stop passage-connect-client-container
 docker container rm passage-connect-client-container
 
-cp config/pam.d/passage-connect /etc/pam.d/
+cp config/pam.d/passage-connect-auth /etc/pam.d/
 
-cp build/passage_connect.so /usr/lib/security/
+cp build/passage_connect.so /usr/lib64/security/
