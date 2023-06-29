@@ -8,7 +8,7 @@ dockerfile_dir="../"
 # Copy the cert directory to the Docker build context
 cp -r "$outside_dir" "$inside_dir"
 
-cp $outside_dir/.env $inside_dir/web/.env
+cp $outside_dir/.env ../web/.env
 
 # Navigate to the directory containing the Dockerfile
 cd "$dockerfile_dir"
