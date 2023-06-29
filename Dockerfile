@@ -1,6 +1,6 @@
 #WARNING: DO NOT RUN THIS FILE DIRECTORY. RATHER GO TO directory server and execute install-connect.sh "sudo bash install-connect.sh"
 # Stage 1: Build the React application
-FROM node:latest AS react-builder
+FROM node:18-alpine AS react-builder
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server .
 
 # Stage 3: Create the final production image
-FROM alpine:18
+FROM alpine:latest
 
 # Set the working directory
 WORKDIR /app
