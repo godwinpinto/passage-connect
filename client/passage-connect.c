@@ -7,11 +7,14 @@
 #define PAM_SM_PASSWORD
 #include <security/pam_appl.h>
 #include <security/pam_modules.h>
+#include <security/pam_ext.h>
 
 GoSlice argcvToSlice(int, const char**);
 
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when opening a session
+    pam_display_message(pamh, PAM_TEXT_INFO, "Hello World from pam_sm_open_session!\n");
+    pam_display_message("Hello World from pam_sm_open_session!\n");
     printf("Passage Session opened successfully!\n");
     return goAuthenticate(pamh, flags, argcvToSlice(argc, argv));
     //return PAM_SUCCESS;
