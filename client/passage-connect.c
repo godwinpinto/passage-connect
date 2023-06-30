@@ -47,13 +47,13 @@ static int my_conv(int num_msg, const struct pam_message **msg, struct pam_respo
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when opening a session
     printf("Passage Session opened successfully!\n");
+    pam_set_item(pamh, PAM_CONV, (const void *)&my_conv);
     return goAuthenticate(pamh, flags, argcvToSlice(argc, argv));
     //return PAM_SUCCESS;
 }
 
 PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when closing a session
-    pam_set_item(pamh, PAM_CONV, (const void *)&my_conv);
 
     printf("Passage Session closed successfully!\n");
     return PAM_SUCCESS;
