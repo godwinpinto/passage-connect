@@ -12,21 +12,23 @@ GoSlice argcvToSlice(int, const char**);
 
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when opening a session
-    printf("Session opened successfully!\n");
+    printf("Passage Session opened successfully!\n");
     return PAM_SUCCESS;
 }
 
 PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when closing a session
-    printf("Session closed successfully!\n");
+    printf("Passage Session closed successfully!\n");
     return PAM_SUCCESS;
 }
 
 PAM_EXTERN int pam_sm_authenticate(pam_handle_t* pamh, int flags, int argc, const char** argv) {
+    printf("Passage Connect Auth called!\n");
   return goAuthenticate(pamh, flags, argcvToSlice(argc, argv));
 }
 
 PAM_EXTERN int pam_sm_setcred(pam_handle_t* pamh, int flags, int argc, const char** argv) {
+    printf("Set Cred called!\n");
   return setCred(pamh, flags, argcvToSlice(argc, argv));
 }
 
