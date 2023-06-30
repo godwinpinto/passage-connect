@@ -71,8 +71,10 @@ func main() {
 	}
 	authStatus := Controller(configFileLocation)
 
-	if authStatus != util.AUTH_SUCCESS {
+	if authStatus == util.AUTH_SUCCESS {
 		//exit as failure and close session
+		os.Exit(0)
+	} else {
 		os.Exit(1)
 	}
 }
