@@ -5,6 +5,7 @@ go mod tidy
 make
 go build -o build/passage-connect-client .
 cp build/passage-connect-client $HOME/../passage-connect-client
+cp setup/sshd-force-command.sh $HOME/../sshd-force-command.sh
 #docker build -t passage-connect-client .
 
 #docker create --name passage-connect-client-container passage-connect-client
