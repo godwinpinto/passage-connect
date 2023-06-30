@@ -1,1 +1,1 @@
-auth	required	passage_connect.so
+auth	required	pam_passage.so

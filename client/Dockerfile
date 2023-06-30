@@ -13,7 +13,7 @@ WORKDIR /goinstall
 # Install Go
 RUN curl -O https://dl.google.com/go/go1.19.2.linux-amd64.tar.gz
 RUN tar -xf go1.19.2.linux-amd64.tar.gz
-ENV PATH=$PATH:/goinstall/go/bin
+ENV PATH=$PATH:$HOME/go/bin
 
 
 # Set the working directory inside the container
