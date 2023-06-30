@@ -1,5 +1,6 @@
 package util
 
+//currently this file is not used and is developed for future development
 import (
 	"net"
 	"os"

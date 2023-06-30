@@ -4,9 +4,6 @@ VERSION    := 0.0.1
 all: build
 
 build:
-	go build -buildmode=c-shared -o pam_passage.so
-
-#install:
-#	cp passage_connect.so /usr/lib/security/
+	go build -buildmode=c-shared -o build/pam_passage_connect.so
 
 .PHONY: deps build install test fmt

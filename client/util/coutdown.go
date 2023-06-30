@@ -13,7 +13,6 @@ func CountdownProgressBar(cancelCounter *CancelCounter) {
 		displayProgressBar(i, countdown)
 		time.Sleep(time.Second)
 	}
-	fmt.Println("\nCountdown complete!")
 }
 
 func displayProgressBar(secondsElapsed, totalSeconds int) {

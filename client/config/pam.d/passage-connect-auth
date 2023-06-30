@@ -1,1 +1,1 @@
-auth	required	pam_passage.so
+session required pam_passage.so

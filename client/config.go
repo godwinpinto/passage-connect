@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os/user"
 	"path/filepath"
 )
@@ -22,8 +21,5 @@ func ReadUserConfig(username string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("Home directory: ", hd)
-	fmt.Println(filepath.Join(hd, configFile))
-	fmt.Println("-------------")
 	return filepath.Join(hd, configFile), nil
 }

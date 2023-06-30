@@ -31,15 +31,9 @@ type ConnectRequest struct {
 }
 
 func Authenticate(connectBean ConnectRequest, appID string) (status AuthStatus) {
-	//	attempts := 2
 	var response string
 	var err error
-	//	for i := 0; i < attempts; i++ {
 	response, err = getData(connectBean)
-	/* 		if err == nil {
-	   			break
-	   		}
-	*/ //	}
 	if response == "" || err != nil {
 		return AUTH_TIMEOUT
 	}
@@ -51,7 +45,7 @@ func Authenticate(connectBean ConnectRequest, appID string) (status AuthStatus) 
 		return
 	}
 
-	return PassageAuthentication(connectRes.Token, appID)
+	return PassageAuthentication(connectRes.Token, appID, connectBean.UserID)
 }
 
 func getData(connectBean ConnectRequest) (response string, err error) {
@@ -70,7 +64,6 @@ func getData(connectBean ConnectRequest) (response string, err error) {
 		return "", err
 	}
 	defer resp.Body.Close()
-	fmt.Print(resp.StatusCode)
 	if resp.StatusCode != http.StatusOK {
 		return "", errors.New("HTTP Status is incorrect")
 	}
@@ -79,29 +72,21 @@ func getData(connectBean ConnectRequest) (response string, err error) {
 	if err != nil {
 		return "", err
 	}
-
-	fmt.Println(string(body))
-
 	return string(body), nil
 }
 
-func PassageAuthentication(authToken string, appID string) (authStatus AuthStatus) {
-	fmt.Println(appID)
-	fmt.Println(authToken)
-
+func PassageAuthentication(authToken string, appID string, userIDFromFile string) (authStatus AuthStatus) {
 	psg, err2 := passage.New(appID, nil)
 	if err2 != nil {
 		fmt.Print(err2)
-	} else {
-		fmt.Print("NO ERROR IN PASSAGE CLIENT CREATION")
 	}
-
 	userID, success := psg.ValidateAuthToken(authToken)
-	fmt.Println(userID)
+	if userIDFromFile != userID {
+		return AUTH_FAILURE
+	}
 	if success {
 		return AUTH_SUCCESS
 	} else {
 		return AUTH_FAILURE
 	}
-
 }

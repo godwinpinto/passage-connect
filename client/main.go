@@ -7,40 +7,19 @@ package main
 import "C"
 
 import (
-	"strings"
-	"time"
+	"fmt"
+	"os"
+	"os/user"
 	"unsafe"
 
 	"github.com/godwinpinto/gatepass/client/util"
 	"github.com/muesli/go-pam"
-	log "github.com/sirupsen/logrus"
 )
-
-var (
-	logLevel = log.InfoLevel
-)
-
-func logError(args ...interface{}) {
-	log.Error(args...)
-	time.Sleep(time.Second)
-}
-
-func logErrorf(s string, args ...interface{}) {
-	log.Errorf(s, args...)
-	time.Sleep(time.Second)
-}
 
 //export goAuthenticate
 func goAuthenticate(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
-	MyFunction("Hello from Go!")
-	for _, arg := range argv {
-		if strings.ToLower(arg) == "debug" {
-			logLevel = log.DebugLevel
-		}
-	}
-	log.SetLevel(logLevel)
-	log.Debugf("argv: %+v", argv)
-
+	//calling a C function from go
+	//MyFunction("Hello from Go!")
 	hdl := pam.Handle{Ptr: unsafe.Pointer(handle)}
 	username, err := hdl.GetUser()
 	if err != nil {
@@ -48,7 +27,6 @@ func goAuthenticate(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
 	}
 	configFileLocation, err := ReadUserConfig(username)
 	if err != nil {
-		logError(err)
 		return C.PAM_SUCCESS
 	}
 	/*
@@ -74,9 +52,29 @@ func setCred(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
 	return C.PAM_SUCCESS
 }
 
-// main is for testing purposes only, the PAM module has to be built with:
+// main is for testing purposes only or deploying as a sshd ForceCommand option, the PAM module has to be built with:
 // go build -buildmode=c-shared
 func main() {
+
+	currentUser, err := user.Current()
+	if err != nil {
+		fmt.Println("Authentication allowed since failed to get username: ")
+		//exit as succes
+		return
+	}
+
+	configFileLocation, err := ReadUserConfig(currentUser.Username)
+	if err != nil {
+		fmt.Println("Authentication allowed No Passage configuration set for user: ", currentUser.Username)
+		//exit as success
+		return
+	}
+	authStatus := Controller(configFileLocation)
+
+	if authStatus != util.AUTH_SUCCESS {
+		//exit as failure and close session
+		os.Exit(1)
+	}
 }
 
 func MyFunction(message string) {

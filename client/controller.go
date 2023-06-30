@@ -54,7 +54,7 @@ func Controller(propertiesFilePath string) util.AuthStatus {
 		myFigure.Print()
 		fmt.Println("")
 		fmt.Println("")
-		fmt.Println("You are logged in")
+		fmt.Println("You are now logged in!!!")
 	} else if authStatus == util.AUTH_TIMEOUT {
 		fmt.Println("Authentication timeout!!! Please login again")
 	} else {
