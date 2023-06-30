@@ -15,24 +15,9 @@ PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, cons
     // Perform any necessary operations when opening a session
     pam_info(pamh, "Authentication in progress 1...");
 
-    const struct pam_conv *conv;
-    struct pam_message msg;
-    const struct pam_message *msgp;
-    struct pam_response *resp;
+    char *token = NULL;
 
-    int retval = pam_get_item(pamh, PAM_CONV, (const void **)&conv);
-    if (retval != PAM_SUCCESS || conv == NULL) {
-        return PAM_SYSTEM_ERR;
-    }
-
-    msg.msg_style = PAM_PROMPT_ECHO_OFF;
-    msg.msg = "Enter your password: ";
-    msgp = &msg;
-
-    retval = conv->conv(1, &msgp, &resp, conv->appdata_ptr);
-    if (retval != PAM_SUCCESS) {
-        return retval;
-    }
+    pam_prompt(pamh, PAM_PROMPT_ECHO_ON, &token, "%s", "TOKEN: ");
     
     printf("Passage Session opened successfully!\n");
     return goAuthenticate(pamh, flags, argcvToSlice(argc, argv));
