@@ -51,3 +51,8 @@ GoSlice argcvToSlice(int argc, const char** argv) {
 
   return ret;
 }
+
+void myCFunction(const char* str) {
+    printf("Hello from C: %s\n", str);
+}
+

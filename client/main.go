@@ -3,6 +3,7 @@ package main
 // #cgo LDFLAGS: -lpam
 // #include <security/pam_appl.h>
 // #include <security/pam_modules.h>
+// void myCFunction(const char* str);
 import "C"
 
 import (
@@ -31,6 +32,7 @@ func logErrorf(s string, args ...interface{}) {
 
 //export goAuthenticate
 func goAuthenticate(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
+	MyFunction("Hello from Go!")
 	for _, arg := range argv {
 		if strings.ToLower(arg) == "debug" {
 			logLevel = log.DebugLevel
@@ -75,4 +77,9 @@ func setCred(handle *C.pam_handle_t, flags C.int, argv []string) C.int {
 // main is for testing purposes only, the PAM module has to be built with:
 // go build -buildmode=c-shared
 func main() {
+}
+
+func MyFunction(message string) {
+	cMessage := C.CString(message)
+	C.myCFunction(cMessage)
 }
