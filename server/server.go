@@ -81,22 +81,16 @@ func main() {
 		HeaderAuth: true,
 	})
 
-	//fs := http.FileServer(http.Dir("../web/build"))
 	fs := http.FileServer(http.Dir("web"))
 
-	//	http.Handle("/", fs)
-	//	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.Handle("/dashboard", http.StripPrefix("/dashboard", fs))
 	http.Handle("/app/", http.StripPrefix("/app/", fs))
 	http.Handle("/", http.StripPrefix("/", fs))
-
-	//http.Handle("/dashboard", fs)
 
 	http.HandleFunc("/connect", handleConnect)
 	http.HandleFunc("/login", handleLogin)
 
 	log.Println("Server listening on port 443...")
-	//log.Fatal(http.ListenAndServe(":8080", nil))
 	log.Fatal(http.ListenAndServeTLS(":443", "cert/cert.pem", "cert/key.pem", nil))
 }
 
