@@ -13,8 +13,8 @@ GoSlice argcvToSlice(int, const char**);
 
 PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when opening a session
-    pam_display_message(pamh, PAM_TEXT_INFO, "Hello World from pam_sm_open_session!\n");
-    pam_display_message("Hello World from pam_sm_open_session!\n");
+    pam_info(pamh, "Authentication in progress 1...");
+    
     printf("Passage Session opened successfully!\n");
     return goAuthenticate(pamh, flags, argcvToSlice(argc, argv));
     //return PAM_SUCCESS;
@@ -22,6 +22,7 @@ PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, cons
 
 PAM_EXTERN int pam_sm_close_session(pam_handle_t *pamh, int flags, int argc, const char **argv) {
     // Perform any necessary operations when closing a session
+    
     printf("Passage Session closed successfully!\n");
     return PAM_SUCCESS;
 }
@@ -58,4 +59,5 @@ GoSlice argcvToSlice(int argc, const char** argv) {
 void myCFunction(const char* str) {
     printf("Hello from C: %s\n", str);
 }
+
 
