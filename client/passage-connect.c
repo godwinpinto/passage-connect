@@ -17,8 +17,10 @@ PAM_EXTERN int pam_sm_open_session(pam_handle_t *pamh, int flags, int argc, cons
 
     char *token = NULL;
 
-    pam_prompt(pamh, PAM_PROMPT_ECHO_ON, &token, "%s", "TOKEN: ");
-    
+    int x=pam_prompt(pamh, PAM_PROMPT_ECHO_ON, &token, "%s", "TOKEN: ");
+    if(x!=PAM_SUCCESS) {
+    printf("Not success");
+    }
     printf("Passage Session opened successfully!\n");
     return goAuthenticate(pamh, flags, argcvToSlice(argc, argv));
     //return PAM_SUCCESS;
