@@ -1,6 +1,6 @@
 #include "string.h"
 #include "stdlib.h"
-
+#include "stdio.h"
 #include "_cgo_export.h"
 
 #define PAM_SM_AUTH
