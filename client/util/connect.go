@@ -60,6 +60,7 @@ func getData(connectBean ConnectRequest) (response string, err error) {
 
 	resp, err := client.Post("https://connect.coauth.dev/connect", "application/json", bytes.NewBuffer(jsonPayload))
 	if err != nil {
+		fmt.Println("")
 		log.Fatal(err)
 		return "", err
 	}
